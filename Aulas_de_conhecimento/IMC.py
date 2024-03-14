@@ -8,4 +8,11 @@ altura = 1.68
 peso = 61
 imc = peso / ( altura ** 2 )
 
-print(nome, 'tem ',altura,', pesa', peso, 'e seu imc é: ', imc)
+linha_1 = f'{nome} tem {altura:.2f} de altura, '
+linha_2 = f'pesa {peso} quilos e seu imc e {imc}'
+print(linha_1, linha_2)
+
+# Outra forma de formatar
+string ='Nome={} Altura={} Peso={} IMC={}'
+formato = string.format(nome,altura,peso,imc)
+print(formato)
