@@ -4,6 +4,10 @@ Curso Python 3 , Udemy, do básico ao avançado.
 Sobre este curso
 Python 3 completo: PySide6, Django, Selenium, Regexp, Testes, TDD, POO, Design Patterns GoF, algoritmos e programação
 
+# Jogo de palavras
+Sobre: Desafio para texto e interação, com adição de uma API para gerar palavras.
+![alt text](https://github.com/acebeR/Python3/blob/main/imagens/e3b778f9-d47b-4a72-a375-7ee5dd3742e8.gif?raw=true)
+
 #Para criar uma máquina virtual no windows
 Comando windows para permitir (Obs: Entrar no powershell no admin para este comando): Set-ExecutionPolicy AllSigned -Force
 
