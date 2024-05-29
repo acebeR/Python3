@@ -84,11 +84,13 @@ def passo4(mult):
         return 0
     else: return rsp
 
-# def valida(passo4):
-
+def valida(cpfGerado, cpfFornecido):
+    if cpfGerado == cpfFornecido:
+        return True
+    else: return False
 
 # Init
-cpf = '070.367.031-80'
+cpf = '746.824.890-70'
 cpfNumeros = retiraCaracter(cpf)
 # Primeiro digito depois do -
 cpfSemDoisUltimos = retirarNumerosLista(cpfNumeros,10)
@@ -106,5 +108,9 @@ p3 = passo3(p2)
 p4Um = passo4(p3)
 print(p4Um)
 
-# resposta = valida(p4)
-# print('CPF valido: ', p4)
+stringGerado = ''.join(cpfSemDoisUltimos)
+stringFornecido = ''.join(cpfNumeros)
+novo_cpf = f'{stringGerado}{p4Dois}{p4Um}'
+print(stringFornecido,'-',novo_cpf)
+resposta = valida(novo_cpf,stringFornecido)
+print('CPF valido: ',resposta)
