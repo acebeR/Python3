@@ -43,21 +43,34 @@ def encontraPrimeiroDuplicado(lista):
 
 def valorIndiceMenor(lista):
     i = 0 
-    menor = {}
-    while i < len(lista) - 1:
-        if lista[i].get('index') > lista[i+1].get('index'):
-            menor = lista[i+1]
-        else :
-            menor = lista[i]
+    menor = None
+    while i < len(lista):
+        j = i + 1
+        while j < len(lista):
+            
+            if menor == None:
+                # print(lista[i].get('index') , lista[j].get('index'))
+                if lista[i].get('index') < lista[j].get('index'):
+                    menor = lista[i]
+                else :
+                    menor = lista[j]
+            else:
+                # print(lista[i].get('index') , lista[j].get('index'), menor.get('index'))
+                if lista[j].get('index') < menor.get('index'):
+                    menor = lista[j]  
+
+            # print("Menor: ",menor)
+            j += 1
         i += 1
-    return menor.get('valor')
+        return menor.get('valor')
 
 def init(lista):
      for l in lista:
+        
         list_obj = encontraPrimeiroDuplicado(l)
+        # print("Lista: ",list_obj)
         retorno = valorIndiceMenor(list_obj)
-        if retorno != None:
-            print('O primeiro numero em ordem que esta repedido e: ',retorno)
+        print('O primeiro numero em ordem que esta repedido e: ',retorno)
 
 init(lista_de_listas_de_inteiros)
     
