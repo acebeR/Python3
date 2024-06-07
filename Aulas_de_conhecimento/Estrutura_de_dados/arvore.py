@@ -44,12 +44,16 @@ def PosOrdem(no):
 
 
 if __name__ == "__main__":
-    root = No('A')
-    root.esquerda = No('B')
-    root.direita = No('C')
-    root.esquerda.esquerda = No('D')
-    root.esquerda.direita = No('E')
-    root.direita.direita = No('F')
+    root = No(3)
+    root.esquerda = No(2)
+    root.direita = No(13)
+    root.direita.esquerda = No(7)
+    root.direita.direita = No(17)
+    root.direita.esquerda.direita = No(9)
+    root.direita.direita.direita = No(23)
+    root.direita.direita.direita.esquerda = No(21)
+    root.direita.direita.direita.direita = No(25)
+
 
     print("Atravessa em pre-ordem > ")
     preOrdemNo(root)
