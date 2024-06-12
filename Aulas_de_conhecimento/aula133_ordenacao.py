@@ -11,3 +11,10 @@ l2 = sorted(lista,key=lambda item: item['nome'])
 print('Original: ',lista)
 # print('L1: ',l1)
 print('L2: ',l2)
+
+# Inserir com range
+lista = [
+    (x)
+    for x in range(3)
+]
+print(lista)
