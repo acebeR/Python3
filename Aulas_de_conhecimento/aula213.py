@@ -2,7 +2,7 @@ class Caneta:
     def __init__(self,cor):
         # Quando coloca o _ é um acordo de todos que isso é privado.
         self._cor = cor
-
+    # getter
     @property
     def cor(self):
         return self._cor
