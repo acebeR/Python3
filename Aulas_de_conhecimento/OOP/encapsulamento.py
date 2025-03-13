@@ -8,9 +8,9 @@ class Foo:
         self.__private = 'não acesso de forma alguma'
 
     def __metodo_private(self):
-        print('não acesso de forma alguma')
+        print('Não acesso de forma alguma')
     def _metodo_protected(self):
-        print('Acordo entre os programadores de python para não usar fora')
+        print('Acordo entre os programadores de python para não usar fora.')
     def metodo_public(self):
         print('Assim pode usar em qualquer lugar...')
 
