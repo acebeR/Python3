@@ -1,8 +1,7 @@
+from Eletronico import Smartphone
 
-from log import LogFileMixin,LogPrintMixin
-l = LogPrintMixin()
-l.log_error('trem...')
-l.log_success('Que legal...')
-lf = LogFileMixin()
-lf.log_error('trem...')
-lf.log_success('Que legal...')
+galaxy_s = Smartphone('Galaxy')
+iphone = Smartphone('Iphone')
+
+galaxy_s.ligar()
+iphone.desligar()
