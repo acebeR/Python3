@@ -7,6 +7,10 @@ Luiz Otávio Miranda
 Sobre este curso
 Python 3 completo: PySide6, Django, Selenium, Regexp, Testes, TDD, POO, Design Patterns GoF, algoritmos e programação
 
+# Jogo dos Animais
+Objetivo: treinar orientação objeto.
+![alt text](https://github.com/acebeR/Python3/Jogo_dos_Animais/image.png?raw=true)
+
 # Jogo de palavras
 Sobre: Desafio para texto e interação, com adição de uma API para gerar palavras.
 ![alt text](https://github.com/acebeR/Python3/blob/main/imagens/e3b778f9-d47b-4a72-a375-7ee5dd3742e8.gif?raw=true)
