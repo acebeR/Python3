@@ -1,0 +1,246 @@
+import json
+import os
+from Banco import Banco
+from Cliente import Cliente
+from Conta import Conta
+
+def salvar_banco_em_arquivo(banco, nome_arquivo):
+    if not isinstance(banco, Banco):
+        raise TypeError("O objeto informado não é uma instância da classe Banco.")
+
+    dados_novos = {
+        "id": banco.id,
+        "agencias": banco.agencias,
+        "clientes": banco.clientes,
+        "contas": banco.contas
+    }
+
+    bancos = []
+
+    # Carrega bancos existentes (se o arquivo existir)
+    if os.path.exists(nome_arquivo):
+        with open(nome_arquivo, 'r', encoding='utf-8') as f:
+            try:
+                bancos = json.load(f)
+            except json.JSONDecodeError:
+                bancos = []
+
+    # Verifica se banco com mesmo ID já existe
+    atualizado = False
+    for i, b in enumerate(bancos):
+        if b['id'] == banco.id:
+            bancos[i] = dados_novos
+            atualizado = True
+            break
+
+    if not atualizado:
+        bancos.append(dados_novos)
+
+    # Salva novamente
+    with open(nome_arquivo, 'w', encoding='utf-8') as f:
+        json.dump(bancos, f, indent=4, ensure_ascii=False)
+
+def carregar_banco_por_id(nome_arquivo):
+
+    if not os.path.exists(nome_arquivo):
+        return []
+
+    try:
+        with open(nome_arquivo, 'r', encoding='utf-8') as f:
+            dados = json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return []
+
+    bancos = []
+    for b in dados:
+        banco = Banco(id=b.get('id'), agencias=b.get('agencias', []))
+        banco.clientes = b.get('clientes', [])
+        banco.contas = b.get('contas', [])
+        bancos.append(banco)
+
+    return bancos
+
+def listar_clientes_do_banco(id_banco, nome_arquivo="db_banco.json"):
+    """
+    Retorna a lista de clientes do banco com o ID informado.
+
+    Args:
+        id_banco (int): ID do banco desejado.
+        nome_arquivo (str): Nome do arquivo JSON.
+
+    Returns:
+        list: Lista de clientes do banco, ou lista vazia se não encontrado.
+    """
+    if not os.path.exists(nome_arquivo):
+        return []
+
+    try:
+        with open(nome_arquivo, 'r', encoding='utf-8') as f:
+            dados = json.load(f)
+            if not isinstance(dados, list):
+                return []
+
+            for banco in dados:
+                if banco.get("id") == id_banco:
+                    return banco.get("clientes", [])
+
+    except (json.JSONDecodeError, FileNotFoundError):
+        return []
+
+    return []
+
+def listar_contas_do_banco(id_banco, nome_arquivo="db_banco.json"):
+    """
+    Lista as contas do banco com o ID informado, lendo do arquivo JSON.
+
+    Args:
+        id_banco (int): ID do banco a ser buscado.
+        nome_arquivo (str): Nome do arquivo JSON.
+
+    Returns:
+        list[dict]: Lista de contas (ou lista vazia se não houver ou não encontrar).
+    """
+    if not os.path.exists(nome_arquivo):
+        print(f"Arquivo '{nome_arquivo}' não encontrado.")
+        return []
+
+    try:
+        with open(nome_arquivo, 'r', encoding='utf-8') as f:
+            bancos = json.load(f)
+    except json.JSONDecodeError:
+        print("Erro ao decodificar o arquivo JSON.")
+        return []
+
+    for banco in bancos:
+        if banco.get("id") == id_banco:
+            return banco.get("contas", [])
+
+    print(f"Nenhum banco com ID {id_banco} encontrado.")
+    return []
+    
+def salvar_contas_do_banco(banco, nome_arquivo="db_banco.json"):
+    """
+    Atualiza a lista de contas de um banco existente no arquivo db_banco.json.
+
+    Args:
+        banco (Banco): Objeto Banco contendo ID e contas (lista de objetos Conta).
+        nome_arquivo (str): Caminho do arquivo JSON.
+    """
+    if not hasattr(banco, 'id') or not hasattr(banco, 'contas'):
+        raise ValueError("Objeto banco inválido ou incompleto.")
+
+    # Converte contas para dicionários
+    contas_convertidas = [conta.to_dict() for conta in banco.contas]
+
+    dados = []
+
+    # Carrega o arquivo existente
+    if os.path.exists(nome_arquivo):
+        try:
+            with open(nome_arquivo, 'r', encoding='utf-8') as f:
+                dados = json.load(f)
+        except json.JSONDecodeError:
+            raise ValueError("Erro ao ler o arquivo JSON. Verifique se ele está corrompido.")
+    else:
+        raise FileNotFoundError(f"O arquivo '{nome_arquivo}' não foi encontrado.")
+
+    # Atualiza as contas do banco com o ID correspondente
+    banco_encontrado = False
+    for i, registro in enumerate(dados):
+        if registro.get("id") == banco.id:
+            dados[i]["contas"] = contas_convertidas
+            banco_encontrado = True
+            break
+
+    if not banco_encontrado:
+        raise ValueError(f"Nenhum banco com ID {banco.id} encontrado no arquivo.")
+
+    # Salva o arquivo atualizado
+    with open(nome_arquivo, 'w', encoding='utf-8') as f:
+        json.dump(dados, f, indent=4, ensure_ascii=False)
+
+    print(f"Contas do banco {banco.id} atualizadas com sucesso em {nome_arquivo}.")
+
+def salvar_cliente_no_banco(cliente, id_banco, nome_arquivo="db_banco.json"):
+    """
+    Adiciona um único cliente ao banco com o ID informado e atualiza o arquivo JSON.
+
+    Args:
+        cliente: Cliente a ser adicionado (pode ser string, dict ou objeto serializável).
+        id_banco (int): ID do banco onde o cliente será adicionado.
+        nome_arquivo (str): Nome do arquivo onde os dados estão armazenados.
+    """
+    if not isinstance(id_banco, int):
+        raise ValueError("ID do banco deve ser um número inteiro.")
+
+    dados = []
+
+    # Carrega os dados do arquivo
+    if os.path.exists(nome_arquivo):
+        try:
+            with open(nome_arquivo, 'r', encoding='utf-8') as f:
+                dados = json.load(f)
+        except json.JSONDecodeError:
+            raise ValueError("Erro ao ler o arquivo JSON. Verifique se ele está corrompido.")
+    else:
+        raise FileNotFoundError(f"O arquivo '{nome_arquivo}' não foi encontrado.")
+
+    # Encontra o banco e adiciona o cliente
+    banco_encontrado = False
+    for banco in dados:
+        if banco.get("id") == id_banco:
+            if "clientes" not in banco or not isinstance(banco["clientes"], list):
+                banco["clientes"] = []
+
+            if isinstance(cliente, Cliente):
+                banco["clientes"].append(cliente.to_dict())
+            else:
+                banco["clientes"].append(cliente)
+            banco_encontrado = True
+            break
+
+    if not banco_encontrado:
+        raise ValueError(f"Nenhum banco com ID {id_banco} encontrado no arquivo.")
+
+    # Salva o arquivo novamente com o cliente adicionado
+    with open(nome_arquivo, 'w', encoding='utf-8') as f:
+        json.dump(dados, f, indent=4, ensure_ascii=False)
+
+    print(f"Cliente adicionado ao banco {id_banco} com sucesso.")
+
+
+
+
+def listar_conta_por_id(id_banco, id_conta, nome_arquivo="db_banco.json"):
+    """
+    Retorna os dados de uma conta específica de um banco específico.
+
+    Args:
+        id_banco (int): ID do banco.
+        id_conta (int): Número da conta.
+        nome_arquivo (str): Caminho do arquivo JSON.
+
+    Returns:
+        dict | None: Dicionário com os dados da conta ou None se não encontrar.
+    """
+    if not os.path.exists(nome_arquivo):
+        print(f"Arquivo '{nome_arquivo}' não encontrado.")
+        return None
+
+    try:
+        with open(nome_arquivo, 'r', encoding='utf-8') as f:
+            bancos = json.load(f)
+    except json.JSONDecodeError:
+        print("Erro ao ler o arquivo JSON.")
+        return None
+
+    for banco in bancos:
+        if banco.get("id") == id_banco:
+            for conta in banco.get("contas", []):
+                if conta.get("numero") == id_conta:
+                    return conta
+            print(f"Conta {id_conta} não encontrada no banco {id_banco}.")
+            return None
+
+    print(f"Banco com ID {id_banco} não encontrado.")
+    return None

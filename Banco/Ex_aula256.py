@@ -36,15 +36,16 @@
 from Banco import Banco
 from Cliente import Cliente
 from Conta import ContaCorrente, ContaPoupanca
+from banco_arquivo import Banco, salvar_banco_em_arquivo,carregar_banco_por_id, salvar_cliente_no_banco, listar_clientes_do_banco,salvar_contas_do_banco,listar_contas_do_banco, listar_conta_por_id
 
-bancos = []
+
 def menu():    
     resposta = 's'
     while resposta == 's':
         primeiroPasso = 0
         while primeiroPasso != 1 and primeiroPasso != 2:
             print("---- Bem vindo ao central de Bancos ----\n")
-            listarBancos()
+            imprimeBancos(0)
             print("-----------")
             print("O que deseja fazer:\n")
             print("1 - Cadastrar um banco\n")
@@ -53,74 +54,165 @@ def menu():
                 primeiroPasso = int(input("Opção: "))
                 if primeiroPasso == 1:
                     banco_bb = cadastraBanco()
-                    bancos.append(banco_bb)
+                    salvar_banco_em_arquivo(banco_bb, "db_banco.json")
                 else:
-                    print("em construcao")
+                    logarBanco()
             except ValueError:
                 print("Digite um número válido.")
         resposta = input("Deseja continuar pesquisando? (s)Sim: ")
 
-def menu2():
-    resposta = 0
-    while resposta > 0 and resposta < 7:
-        print("1 - Cadastrar Conta")
-        print("2 - Listar Contas")
-        print("3 - Cadastrar Cliente")
-        print("4 - Listar Clientes")
-        print("5 - Vincular cliente conta")
-        print("6 - Lista cliente e conta")
-        resposta = input("Escolha uma opção: ")
-    match resposta:
-        case 1:
-            conta1 = ContaCorrente(1001, 12345, 1000, limite=300)
-        case 2:
-            print("Listar")
-        case 3:
-            cliente1 = Cliente("João", 30)
-        case 4:
-            print("Sair")
-        case 5:
-            cliente1.inserir_conta(conta1)
-        case 6:
-            print("Sair")
-        case _:
-            print("Opção inválida")
+def menu2(banco):
+    resposta = 's'
+    while resposta == 's':
+        print("=========================")
+        resposta = 0
+        while resposta == 0 or resposta > 7:
+            print("1 - Cadastrar Conta")
+            print("2 - Listar Contas")
+            print("3 - Cadastrar Cliente")
+            print("4 - Listar Clientes")
+            print("5 - Depositar em uma conta")
+            resposta = int(input("Escolha uma opção: "))
+        contas = listar_contas_do_banco(banco.id)
+        clientes = listar_clientes_do_banco(banco.id)
+        match resposta:
+            case 1:
+                print("1 - Corrente")
+                print("2 - Poupança")
+                respConta = input("Qual o tipo de conta? ")
+                print("Agencias - ",banco.agencias)
+                agencia = input("Qual a agencia? ")
+                id = 1
+                if contas:
+                    id = len(contas) + 1
+                if respConta == 1:
+                    conta = ContaCorrente(id, agencia, 0)
+                else:
+                    conta = ContaPoupanca(id, agencia, 0)
+                print("==============")
+                print("Conta cadastrada com sucesso ", conta.numero)
+                banco.adicionar_conta(conta)
+                salvar_contas_do_banco(banco,"db_banco.json")
+            case 2:
+                print("======= Contas do Banco ", banco.id, " =======")
+                imprimeContas(banco.id,0)
+            case 3:
+                print("======= Cadastrar Cliente no banco: ", banco.id, " =======")
+                nome = input("Nome do cliente: ")
+                idade = int(input("Idade do cliente: "))
+                imprimeContas(banco.id,0)
+                idconta = int(input("Qual a conta? "))
+                conta = listar_conta_por_id(banco.id, idconta)
+                id = 1
+                if clientes:
+                    id = len(clientes) + 1
+                else:
+                    id = 1
+                cliente = Cliente(nome, idade, conta,id)
+                salvar_cliente_no_banco(cliente,banco.id,"db_banco.json")
+            case 4:
+                print("======= Todos os clientes do banco: ", banco.id, " =======")
+                imprimeClientes(banco.id,0)
+            case 5:
+                print("======= Deposito  =======")
+                print("Contas: ")
+                imprimeContas(banco.id, 0)
+                conta = int(input("Em qual conta deseja depositar? "))
+                valor = input("Valor desejado para depósito: ")
+                imprimeClientes(banco.id,0)
+            case _:
+                print("Opção inválida")
+        resposta = input("Deseja continuar pesquisando neste banco? (s)Sim: ")
 def logarBanco():
-    idBanco = int(input("Em qual banco deseja entrar (id)?"))
+    idBanco = int(input("Em qual banco deseja entrar (id)? "))
+    bancos = listarBancos(0)
     valida = False
+    bancoEncontrado = Banco
     for banco in bancos:
         if banco.id == idBanco:
+            bancoEncontrado = banco
             valida = True
             break
     if valida:
-        menu2()
-
+        print("================")
+        print("Você está no banco ")
+        imprimeBancos(bancoEncontrado.id)
+        menu2(bancoEncontrado)
     else:
-        "Este Banco não está cadastrado"
+        print("Este Banco não está cadastrado")
 
-
-def listarBancos():
-    if bancos:
+def listarBancos(identrada):
+    bancos = carregar_banco_por_id("db_banco.json")
+    if identrada == 0:
+        return bancos
+    else:
         for banco in bancos:
-            print(f"Banco: {banco.id} - Agências: {banco.agencias}")
-    else:
-        print("Ainda não possui bancos cadastrados!")
+            if banco.id == identrada:
+                return banco
+            
+def imprimeBancos(identrada):
+    bancos = listarBancos(identrada)
+    if identrada == 0:
+        for banco in bancos:
+            print("Banco: ", banco.id," - Agencia: ", banco.agencias)
+    else:  
+        if type(bancos) == list:
+            for banco in bancos:
+                if banco.id == identrada:
+                    print("Banco: ", banco.id," - Agencia: ", banco.agencias)
+        else:
+            print("Banco: ", bancos.id," - Agencia: ", bancos.agencias)
 
+def imprimeContas(idBanco, identrada):
+    print(f"Banco ID: {idBanco}")
+    contas = listar_contas_do_banco(idBanco, "db_banco.json")
+
+    if not contas:
+        print("Nenhuma conta encontrada.")
+        return
+
+    if identrada == 0:
+        for conta in contas:
+            print("Conta:", conta["numero"], "- Agência:", conta["agencia"])
+    else:
+        encontrou = False
+        for conta in contas:
+            if conta["numero"] == identrada:
+                print("Conta:", conta["numero"], "- Agência:", conta["agencia"])
+                encontrou = True
+                break
+        if not encontrou:
+            print(f"Conta {identrada} não encontrada no banco {idBanco}.")
+
+def imprimeClientes(idBanco,identrada):
+    print(f"Banco ID: {idBanco}")
+    clientes = listar_clientes_do_banco(idBanco, "db_banco.json")
+    if identrada == 0:
+        for cliente in clientes:
+            print("Cliente: ", cliente["nome"]," - Idade: ", cliente["idade"])
+    else:  
+        if type(clientes) == list:
+            for cliente in clientes:
+                if cliente.id == identrada:
+                    print("Cliente: ", cliente["nome"]," - Idade: ", cliente["idade"])
+        else:
+            print("Cliente: ", clientes["nome"]," - Idade: ", clientes["idade"])
+                
 def cadastraBanco():
-    qtdagencias = int(input("Quantas agencias quer cadastra no seu banco?"))
+    bancos = listarBancos(0)
+    qtdagencias = int(input("Quantas agencias quer cadastra no seu banco? "))
     agencias = []
     id = 0
     while qtdagencias > 0:
         agencias.append(int(input(f"Agência {qtdagencias}: ")))
         qtdagencias = qtdagencias - 1
     if bancos:
-        id = len(bancos)
+        id = len(bancos) + 1
     else:
         id = 1;        
 
     return Banco(id,agencias)
     
-
 def main():
     menu()
 

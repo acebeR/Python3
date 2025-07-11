@@ -6,10 +6,24 @@ class Conta:
         self.agencia = agencia
         self.saldo = saldo
 
+    def to_dict(self):
+        return {
+            "numero": self.numero,
+            "agencia": self.agencia,
+            "saldo": self.saldo,
+            "tipo": self.tipo()  # opcional: identifica o tipo no JSON
+        }
 
     def depositar(self):
-        valor = input("Digite o valor que deseja adicionar na conta: ")
-        saldo = saldo + valor
+        try:
+            valor = float(input("Digite o valor que deseja adicionar na conta: "))
+            if valor <= 0:
+                print("Valor deve ser positivo.")
+                return
+            self.saldo += valor
+            print(f"Depósito de R${valor:.2f} realizado. Saldo atual: R${self.saldo:.2f}")
+        except ValueError:
+            print("Entrada inválida. Digite um número.")
 
     @abstractmethod
     def sacar(self, valor):

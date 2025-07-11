@@ -7,7 +7,7 @@ class Banco:
 
     def listarAgencias(self):
         for agencia in self.agencias:
-            print(agencia)
+            print(agencia, end='')
 
     def adicionar_cliente(self, cliente):
         self.clientes.append(cliente)
