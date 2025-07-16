@@ -8,14 +8,17 @@ Sobre este curso
 Python 3 completo: PySide6, Django, Selenium, Regexp, Testes, TDD, POO, Design Patterns GoF, algoritmos e programação
 # Simulação Banco
 Objetivo: Treinar meus conhecimentos de OOP e Python
-![alt text](https://github.com/acebeR/Python3/Banco/Simulador_banco.gif?raw=true)
+</br>
+<img src="https://github.com/acebeR/Python3/blob/main/Banco/Simulador%20banco.gif?raw=true" alt="Minha imagem" width="600" />
 # Jogo dos Animais
+</br>
 Objetivo: treinar orientação objeto.
-![alt text](https://github.com/acebeR/Python3/Jogo_dos_Animais/image.png?raw=true)
+<img src="https://github.com/acebeR/Python3/blob/main/Jogo%20dos%20Animais/image.png?raw=true" alt="Minha imagem" width="600" />
 
 # Jogo de palavras
 Sobre: Desafio para texto e interação, com adição de uma API para gerar palavras.
-![alt text](https://github.com/acebeR/Python3/blob/main/imagens/e3b778f9-d47b-4a72-a375-7ee5dd3742e8.gif?raw=true)
+</br>
+<img src="https://github.com/acebeR/Python3/blob/main/imagens/e3b778f9-d47b-4a72-a375-7ee5dd3742e8.gif" alt="Minha imagem" width="600" />
 
 #Para criar uma máquina virtual no windows
 Comando windows para permitir (Obs: Entrar no powershell no admin para este comando): Set-ExecutionPolicy AllSigned -Force
