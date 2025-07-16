@@ -6,7 +6,9 @@ Luiz Otávio Miranda
 
 Sobre este curso
 Python 3 completo: PySide6, Django, Selenium, Regexp, Testes, TDD, POO, Design Patterns GoF, algoritmos e programação
-
+# Simulação Banco
+Objetivo: Treinar meus conhecimentos de OOP e Python
+![alt text](https://github.com/acebeR/Python3/Banco/Simulador_banco.gif?raw=true)
 # Jogo dos Animais
 Objetivo: treinar orientação objeto.
 ![alt text](https://github.com/acebeR/Python3/Jogo_dos_Animais/image.png?raw=true)
