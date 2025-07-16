@@ -2,28 +2,27 @@
     {
         "id": 1,
         "agencias": [
-            123,
             321
         ],
         "clientes": [
             {
-                "nome": "Rebeca",
-                "idade": 28,
+                "nome": "Rebeca Paula",
+                "idade": 27,
                 "id": 1,
                 "conta": {
                     "numero": 1,
-                    "agencia": "123",
+                    "agencia": "321",
                     "saldo": 0,
-                    "tipo": "Conta Poupança"
+                    "tipo": "Conta Corrente"
                 }
             }
         ],
         "contas": [
             {
                 "numero": 1,
-                "agencia": "123",
-                "saldo": 0,
-                "tipo": "Conta Poupança"
+                "agencia": "321",
+                "saldo": 200.0,
+                "tipo": "Conta Corrente"
             }
         ]
     }

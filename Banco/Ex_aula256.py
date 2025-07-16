@@ -36,8 +36,9 @@
 from Banco import Banco
 from Cliente import Cliente
 from Conta import ContaCorrente, ContaPoupanca
-from banco_arquivo import Banco, salvar_banco_em_arquivo,carregar_banco_por_id, salvar_cliente_no_banco, listar_clientes_do_banco,salvar_contas_do_banco,listar_contas_do_banco, listar_conta_por_id
-
+from banco_arquivo import Banco, salvar_banco_em_arquivo,carregar_banco_por_id, salvar_cliente_no_banco, listar_clientes_do_banco,salvar_contas_do_banco,listar_contas_do_banco, listar_conta_por_id,depositar_em_conta
+import json
+import os
 
 def menu():    
     resposta = 's'
@@ -79,7 +80,7 @@ def menu2(banco):
             case 1:
                 print("1 - Corrente")
                 print("2 - Poupança")
-                respConta = input("Qual o tipo de conta? ")
+                respConta = int(input("Qual o tipo de conta? "))
                 print("Agencias - ",banco.agencias)
                 agencia = input("Qual a agencia? ")
                 id = 1
@@ -114,32 +115,48 @@ def menu2(banco):
                 print("======= Todos os clientes do banco: ", banco.id, " =======")
                 imprimeClientes(banco.id,0)
             case 5:
-                print("======= Deposito  =======")
-                print("Contas: ")
+                print("======= Depósito =======")
+                print("Contas:")
                 imprimeContas(banco.id, 0)
                 conta = int(input("Em qual conta deseja depositar? "))
-                valor = input("Valor desejado para depósito: ")
-                imprimeClientes(banco.id,0)
+                try:
+                    valor = float(input("Valor desejado para depósito: "))
+                except ValueError:
+                    print("Valor inválido! Digite um número decimal válido.")
+                    return  # ou trate o erro do jeito que preferir
+
+                imprimeClientes(banco.id, 0)
+                depositar_em_conta(banco, conta, valor, "db_banco.json")
             case _:
                 print("Opção inválida")
         resposta = input("Deseja continuar pesquisando neste banco? (s)Sim: ")
+
+
 def logarBanco():
     idBanco = int(input("Em qual banco deseja entrar (id)? "))
-    bancos = listarBancos(0)
-    valida = False
-    bancoEncontrado = Banco
-    for banco in bancos:
-        if banco.id == idBanco:
-            bancoEncontrado = banco
-            valida = True
+    bancos_raw = listarBancos(0)  # Supondo que retorna lista de dicts ou objetos misturados
+
+    bancoEncontrado = None
+    for banco in bancos_raw:
+        # Se 'banco' for dict, converta para objeto Banco
+        if isinstance(banco, dict):
+            # Converter para Banco objeto usando from_dict
+            banco_obj = Banco.from_dict(banco)
+        else:
+            banco_obj = banco
+
+        if banco_obj.id == idBanco:
+            bancoEncontrado = banco_obj
             break
-    if valida:
+
+    if bancoEncontrado:
         print("================")
         print("Você está no banco ")
         imprimeBancos(bancoEncontrado.id)
         menu2(bancoEncontrado)
     else:
         print("Este Banco não está cadastrado")
+
 
 def listarBancos(identrada):
     bancos = carregar_banco_por_id("db_banco.json")

@@ -244,3 +244,51 @@ def listar_conta_por_id(id_banco, id_conta, nome_arquivo="db_banco.json"):
 
     print(f"Banco com ID {id_banco} não encontrado.")
     return None
+def depositar_em_conta(banco, numero_conta, valor, nome_arquivo="db_banco.json"):
+    if valor <= 0:
+        print("O valor do depósito deve ser positivo.")
+        return
+
+    if not os.path.exists(nome_arquivo):
+        print(f"Arquivo {nome_arquivo} não encontrado.")
+        return
+
+    with open(nome_arquivo, "r", encoding="utf-8") as f:
+        dados = json.load(f)
+
+    banco_encontrado = False
+    conta_encontrada = False
+
+    for i, banco_dict in enumerate(dados):
+        if banco_dict.get("id") == banco.id:
+            banco_encontrado = True
+            for j, conta_dict in enumerate(banco_dict.get("contas", [])):
+                if conta_dict.get("numero") == numero_conta:
+                    conta_encontrada = True
+                    saldo_atual = conta_dict.get("saldo", 0)
+                    novo_saldo = saldo_atual + valor
+                    dados[i]["contas"][j]["saldo"] = novo_saldo
+                    print(f"Depósito de R${valor:.2f} realizado na conta {numero_conta}. Saldo atualizado: R${novo_saldo:.2f}")
+
+                    # Atualiza saldo no objeto banco, independente de dict ou objeto Conta
+                    for k, c in enumerate(banco.contas):
+                        numero = c.numero if hasattr(c, 'numero') else c.get('numero')
+                        if numero == numero_conta:
+                            if hasattr(c, 'saldo'):
+                                c.saldo = novo_saldo
+                            else:
+                                c['saldo'] = novo_saldo
+                            break
+                    break
+            break
+
+    if not banco_encontrado:
+        print(f"Banco com ID {banco.id} não encontrado no arquivo.")
+        return
+
+    if not conta_encontrada:
+        print(f"Conta número {numero_conta} não encontrada no banco {banco.id}.")
+        return
+
+    with open(nome_arquivo, "w", encoding="utf-8") as f:
+        json.dump(dados, f, indent=4, ensure_ascii=False)

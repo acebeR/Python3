@@ -33,6 +33,10 @@ class ContaCorrente(Conta):
     def tipo(self):
         return "Conta Corrente"
     
+    @classmethod
+    def from_dict(cls, dados):
+        return cls(dados["numero"], dados["agencia"], dados["saldo"])
+    
     def sacar(self, valor):
         if valor <= self.saldo:
             self.saldo -= valor
@@ -43,6 +47,14 @@ class ContaCorrente(Conta):
 class ContaPoupanca(Conta):
     def tipo(self):
         return "Conta Poupança"
+    
+    @classmethod
+    def from_dict(cls, dados):
+        return cls(
+            numero=dados["numero"],
+            agencia=dados["agencia"],
+            saldo=dados["saldo"]
+        )
     
     def sacar(self, valor):
         taxa = 0.02 * valor  

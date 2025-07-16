@@ -30,3 +30,25 @@ class Banco:
             return False
         print("Autenticação bem-sucedida.")
         return True
+        
+    @classmethod
+    def from_dict(cls, dados):
+        banco = cls(
+            id=dados["id"],
+            agencias=dados.get("agencias", [])
+        )
+
+        # Reconstruindo objetos Conta
+        contas_objetos = []
+        for conta_dado in dados.get("contas", []):
+            tipo = conta_dado.get("tipo")
+            if tipo == "Conta Corrente":
+                contas_objetos.append(ContaCorrente.from_dict(conta_dado))
+            elif tipo == "Conta Poupança":
+                contas_objetos.append(ContaPoupanca.from_dict(conta_dado))
+        banco.contas = contas_objetos
+
+        # Se quiser reconstruir os clientes também (opcional)
+        banco.clientes = dados.get("clientes", [])
+
+        return banco
