@@ -100,6 +100,7 @@ def listar_contas_do_banco(id_banco, nome_arquivo="db_banco.json"):
     Returns:
         list[dict]: Lista de contas (ou lista vazia se não houver ou não encontrar).
     """
+    retorno = []
     if not os.path.exists(nome_arquivo):
         print(f"Arquivo '{nome_arquivo}' não encontrado.")
         return []
@@ -113,9 +114,11 @@ def listar_contas_do_banco(id_banco, nome_arquivo="db_banco.json"):
 
     for banco in bancos:
         if banco.get("id") == id_banco:
-            return banco.get("contas", [])
+            retorno = banco.get("contas", [])
+            if retorno:
+                return retorno
 
-    print(f"Nenhum banco com ID {id_banco} encontrado.")
+    print(f"Não foi encontrado contas no banco: {id_banco}.")
     return []
     
 def salvar_contas_do_banco(banco, nome_arquivo="db_banco.json"):
@@ -160,6 +163,52 @@ def salvar_contas_do_banco(banco, nome_arquivo="db_banco.json"):
         json.dump(dados, f, indent=4, ensure_ascii=False)
 
     print(f"Contas do banco {banco.id} atualizadas com sucesso em {nome_arquivo}.")
+
+def atualizar_conta_no_banco(id_banco, conta_atualizada, nome_arquivo="db_banco.json"):
+    """
+    Atualiza uma conta específica dentro de um banco no arquivo JSON.
+
+    Args:
+        id_banco (int): ID do banco onde a conta será atualizada.
+        conta_atualizada (Conta): Objeto Conta com dados novos.
+        nome_arquivo (str): Caminho para o arquivo JSON.
+    """
+    if not hasattr(conta_atualizada, 'numero') or not hasattr(conta_atualizada, 'to_dict'):
+        raise ValueError("Objeto conta inválido ou incompleto.")
+
+    if not os.path.exists(nome_arquivo):
+        raise FileNotFoundError(f"Arquivo '{nome_arquivo}' não encontrado.")
+
+    try:
+        with open(nome_arquivo, 'r', encoding='utf-8') as f:
+            dados = json.load(f)
+    except json.JSONDecodeError:
+        raise ValueError("Erro ao ler o arquivo JSON. Verifique se está corrompido.")
+
+    banco_encontrado = False
+    conta_encontrada = False
+
+    for banco in dados:
+        if banco.get("id") == id_banco:
+            banco_encontrado = True
+            for i, conta in enumerate(banco.get("contas", [])):
+                if conta.get("numero") == conta_atualizada.numero:
+                    banco["contas"][i] = conta_atualizada.to_dict()
+                    conta_encontrada = True
+                    break
+            break
+
+    if not banco_encontrado:
+        raise ValueError(f"Banco com ID {id_banco} não encontrado.")
+
+    if not conta_encontrada:
+        raise ValueError(f"Conta número {conta_atualizada.numero} não encontrada no banco {id_banco}.")
+
+    # Salva os dados atualizados no JSON
+    with open(nome_arquivo, 'w', encoding='utf-8') as f:
+        json.dump(dados, f, indent=4, ensure_ascii=False)
+
+    print(f"Conta {conta_atualizada.numero} atualizada com sucesso no banco {id_banco}.")
 
 def salvar_cliente_no_banco(cliente, id_banco, nome_arquivo="db_banco.json"):
     """

@@ -36,7 +36,7 @@
 from Banco import Banco
 from Cliente import Cliente
 from Conta import ContaCorrente, ContaPoupanca
-from banco_arquivo import Banco, salvar_banco_em_arquivo,carregar_banco_por_id, salvar_cliente_no_banco, listar_clientes_do_banco,salvar_contas_do_banco,listar_contas_do_banco, listar_conta_por_id,depositar_em_conta
+from banco_arquivo import Banco, salvar_banco_em_arquivo,carregar_banco_por_id, salvar_cliente_no_banco, listar_clientes_do_banco,salvar_contas_do_banco,listar_contas_do_banco, listar_conta_por_id,depositar_em_conta,atualizar_conta_no_banco
 import json
 import os
 
@@ -66,72 +66,26 @@ def menu2(banco):
     resposta = 's'
     while resposta == 's':
         print("=========================")
+        print("deseja mexer com:")
         resposta = 0
         while resposta == 0 or resposta > 7:
-            print("1 - Cadastrar Conta")
-            print("2 - Listar Contas")
-            print("3 - Cadastrar Cliente")
-            print("4 - Listar Clientes")
-            print("5 - Depositar em uma conta")
+            print("1 - Cliente")
+            print("2 - Conta")
             resposta = int(input("Escolha uma opção: "))
-        contas = listar_contas_do_banco(banco.id)
-        clientes = listar_clientes_do_banco(banco.id)
         match resposta:
             case 1:
-                print("1 - Corrente")
-                print("2 - Poupança")
-                respConta = int(input("Qual o tipo de conta? "))
-                print("Agencias - ",banco.agencias)
-                agencia = input("Qual a agencia? ")
-                id = 1
-                if contas:
-                    id = len(contas) + 1
-                if respConta == 1:
-                    conta = ContaCorrente(id, agencia, 0)
-                else:
-                    conta = ContaPoupanca(id, agencia, 0)
-                print("==============")
-                print("Conta cadastrada com sucesso ", conta.numero)
-                banco.adicionar_conta(conta)
-                salvar_contas_do_banco(banco,"db_banco.json")
+                menucliente(banco)
             case 2:
-                print("======= Contas do Banco ", banco.id, " =======")
-                imprimeContas(banco.id,0)
-            case 3:
-                print("======= Cadastrar Cliente no banco: ", banco.id, " =======")
-                nome = input("Nome do cliente: ")
-                idade = int(input("Idade do cliente: "))
-                imprimeContas(banco.id,0)
-                idconta = int(input("Qual a conta? "))
-                conta = listar_conta_por_id(banco.id, idconta)
-                id = 1
-                if clientes:
-                    id = len(clientes) + 1
-                else:
-                    id = 1
-                cliente = Cliente(nome, idade, conta,id)
-                salvar_cliente_no_banco(cliente,banco.id,"db_banco.json")
-            case 4:
-                print("======= Todos os clientes do banco: ", banco.id, " =======")
-                imprimeClientes(banco.id,0)
-            case 5:
-                print("======= Depósito =======")
-                print("Contas:")
-                imprimeContas(banco.id, 0)
-                conta = int(input("Em qual conta deseja depositar? "))
-                try:
-                    valor = float(input("Valor desejado para depósito: "))
-                except ValueError:
-                    print("Valor inválido! Digite um número decimal válido.")
-                    return  # ou trate o erro do jeito que preferir
-
-                imprimeClientes(banco.id, 0)
-                depositar_em_conta(banco, conta, valor, "db_banco.json")
+                menuConta(banco)
             case _:
-                print("Opção inválida")
+                print("Opção inválida!\n")
         resposta = input("Deseja continuar pesquisando neste banco? (s)Sim: ")
 
 
+def limpar_console():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+# ---------------- Banco
 def logarBanco():
     idBanco = int(input("Em qual banco deseja entrar (id)? "))
     bancos_raw = listarBancos(0)  # Supondo que retorna lista de dicts ou objetos misturados
@@ -157,7 +111,6 @@ def logarBanco():
     else:
         print("Este Banco não está cadastrado")
 
-
 def listarBancos(identrada):
     bancos = carregar_banco_por_id("db_banco.json")
     if identrada == 0:
@@ -179,42 +132,6 @@ def imprimeBancos(identrada):
                     print("Banco: ", banco.id," - Agencia: ", banco.agencias)
         else:
             print("Banco: ", bancos.id," - Agencia: ", bancos.agencias)
-
-def imprimeContas(idBanco, identrada):
-    print(f"Banco ID: {idBanco}")
-    contas = listar_contas_do_banco(idBanco, "db_banco.json")
-
-    if not contas:
-        print("Nenhuma conta encontrada.")
-        return
-
-    if identrada == 0:
-        for conta in contas:
-            print("Conta:", conta["numero"], "- Agência:", conta["agencia"])
-    else:
-        encontrou = False
-        for conta in contas:
-            if conta["numero"] == identrada:
-                print("Conta:", conta["numero"], "- Agência:", conta["agencia"])
-                encontrou = True
-                break
-        if not encontrou:
-            print(f"Conta {identrada} não encontrada no banco {idBanco}.")
-
-def imprimeClientes(idBanco,identrada):
-    print(f"Banco ID: {idBanco}")
-    clientes = listar_clientes_do_banco(idBanco, "db_banco.json")
-    if identrada == 0:
-        for cliente in clientes:
-            print("Cliente: ", cliente["nome"]," - Idade: ", cliente["idade"])
-    else:  
-        if type(clientes) == list:
-            for cliente in clientes:
-                if cliente.id == identrada:
-                    print("Cliente: ", cliente["nome"]," - Idade: ", cliente["idade"])
-        else:
-            print("Cliente: ", clientes["nome"]," - Idade: ", clientes["idade"])
-                
 def cadastraBanco():
     bancos = listarBancos(0)
     qtdagencias = int(input("Quantas agencias quer cadastra no seu banco? "))
@@ -230,6 +147,157 @@ def cadastraBanco():
 
     return Banco(id,agencias)
     
+# ---------------- Conta
+def imprimeContas(idBanco, identrada):
+    print(f"Banco ID: {idBanco}")
+    contas = listar_contas_do_banco(idBanco, "db_banco.json")
+
+    if not contas:
+        return
+
+    if identrada == 0:
+        for conta in contas:
+            print("Conta:", conta["numero"], "- Agência:", conta["agencia"])
+    else:
+        encontrou = False
+        for conta in contas:
+            if conta["numero"] == identrada:
+                print("Conta:", conta["numero"], "- Agência:", conta["agencia"])
+                encontrou = True
+                break
+        if not encontrou:
+            print(f"Conta {identrada} não encontrada no banco {idBanco}.")
+def menuConta(banco):
+    resposta = 's'
+    while resposta == 's':
+        print("============ Menu Conta =============")
+        resposta = 0
+        while resposta == 0 or resposta > 7:
+            print("1 - Cadastrar")
+            print("2 - Depositar")
+            print("3 - Alterar")
+            resposta = int(input("Escolha uma opção: "))
+        contas = listar_contas_do_banco(banco.id)
+        print("======= Contas do Banco ", banco.id, " =======")
+        imprimeContas(banco.id,0)
+        print("=================")
+        match resposta:
+            case 1:
+                respConta = 0
+                while respConta < 1 or respConta > 2:
+                    print("1 - Corrente")
+                    print("2 - Poupança")
+                    respConta = int(input("Qual o tipo de conta? "))
+                while validaAgencia(banco.agencias) == False:
+                    print("Agencias - ",banco.agencias)
+                    agencia = input("Qual a agencia? ")
+                id = 1
+                if contas:
+                    id = len(contas) + 1
+                if respConta == 1:
+                    conta = ContaCorrente(id, agencia, 0)
+                else:
+                    conta = ContaPoupanca(id, agencia, 0)
+                print("==============")
+                print("Conta cadastrada com sucesso ", conta.numero)
+                banco.adicionar_conta(conta)
+                salvar_contas_do_banco(banco,"db_banco.json")
+            case 2:
+                print("======= Depósito =======")
+                print("Contas:")
+                imprimeContas(banco.id, 0)
+                conta = int(input("Em qual conta deseja depositar? "))
+                try:
+                    valor = float(input("Valor desejado para depósito: "))
+                except ValueError:
+                    print("Valor inválido! Digite um número decimal válido.")
+                    return  # ou trate o erro do jeito que preferir
+
+                imprimeClientes(banco.id, 0)
+                depositar_em_conta(banco, conta, valor, "db_banco.json")
+            case 3: 
+                respConta = 0
+                while respConta < 1 or respConta > 2:
+                    print("1 - Corrente")
+                    print("2 - Poupança")
+                    respConta = int(input("Qual o tipo de conta? "))
+                valida = False
+                while valida == False:
+                    print("Agencias - ",banco.agencias)
+                    agencia = input("Qual a agencia? ")
+                    valida = validaAgencia(banco.agencias, agencia)
+                id = 1
+                if contas:
+                    id = len(contas) + 1
+                if respConta == 1:
+                    conta = ContaCorrente(id, agencia,0)
+                else:
+                    conta = ContaPoupanca(id, agencia, 0)
+
+                atualizar_conta_no_banco(banco.id,conta)
+            case _:
+                print("Opção inválida")
+        resposta = input("Deseja continuar pesquisando neste menu? (s)Sim: ")
+def validaAgencia(agencias,entrada):
+    for agencia in agencias:
+        print(type(agencia) ,type(entrada))
+        if agencia == int(entrada):
+            return True
+    print("Agência inválida!\n")
+    return False
+# ---------------- Cliente
+def imprimeClientes(idBanco,identrada):
+    print(f"Banco ID: {idBanco}")
+    clientes = listar_clientes_do_banco(idBanco, "db_banco.json")
+    if identrada == 0:
+        for cliente in clientes:
+            print("Cliente: ", cliente["nome"]," - Idade: ", cliente["idade"])
+    else:  
+        if type(clientes) == list:
+            for cliente in clientes:
+                if cliente.id == identrada:
+                    print("Cliente: ", cliente["nome"]," - Idade: ", cliente["idade"])
+        else:
+            print("Cliente: ", clientes["nome"]," - Idade: ", clientes["idade"])
+def menucliente(banco):
+    resposta = 's'
+    while resposta == 's':
+        print("============ Menu Cliente =============")
+        resposta = 0
+        while resposta == 0 or resposta > 7:
+            print("1 - Cadastrar")
+            print("2 - Alterar")
+            resposta = int(input("Escolha uma opção: "))
+        contas = listar_contas_do_banco(banco.id)
+        clientes = listar_clientes_do_banco(banco.id)
+        print("======= Todos os clientes do banco: ", banco.id, " =======")
+        imprimeClientes(banco.id,0)
+        print("===================================")
+        match resposta:
+            case 1:
+                print("1 - Corrente")
+                print("2 - Poupança")
+                respConta = int(input("Qual o tipo de conta? "))
+                print("Agencias - ",banco.agencias)
+                agencia = input("Qual a agencia? ")
+                id = 1
+                if contas:
+                    id = len(contas) + 1
+                if respConta == 1:
+                    conta = ContaCorrente(id, agencia, 0)
+                else:
+                    conta = ContaPoupanca(id, agencia, 0)
+                print("==============")
+                print("Conta cadastrada com sucesso ", conta.numero)
+                banco.adicionar_conta(conta)
+                salvar_contas_do_banco(banco,"db_banco.json")
+            case 2:
+                print("Em construcao")
+            case _:
+                print("Opção inválida")
+        resposta = input("Deseja continuar pesquisando neste menu? (s)Sim: ")
+               
+
 def main():
     menu()
 
