@@ -2,46 +2,41 @@
     {
         "id": 1,
         "agencias": [
-            321
+            123
         ],
         "clientes": [
             {
                 "nome": "Rebeca",
-                "idade": 12,
+                "idade": 28,
                 "id": 1,
-                "conta": 1
+                "conta": {
+                    "numero": 1,
+                    "agencia": "123",
+                    "saldo": 0,
+                    "tipo": "Conta Corrente",
+                    "dataCadastro": "06-08-2025 17:41"
+                },
+                "data cadastrado": "06-08-2025 17:42"
             }
         ],
         "contas": [
             {
                 "numero": 1,
-                "agencia": "321",
+                "agencia": "123",
                 "saldo": 0,
-                "tipo": "Conta Corrente"
+                "tipo": "Conta Corrente",
+                "dataCadastro": "06-08-2025 17:41"
             }
-        ]
+        ],
+        "dataCadastro": "06-08-2025 16:28"
     },
     {
         "id": 2,
         "agencias": [
-            258,
-            852
+            321
         ],
-        "clientes": [
-            {
-                "nome": "Rebeca Divina",
-                "idade": 28,
-                "id": 1,
-                "conta": 1
-            }
-        ],
-        "contas": [
-            {
-                "numero": 1,
-                "agencia": "258",
-                "saldo": 500.0,
-                "tipo": "Conta Corrente"
-            }
-        ]
+        "clientes": [],
+        "contas": [],
+        "dataCadastro": "06-08-2025 17:21"
     }
 ]

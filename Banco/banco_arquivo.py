@@ -3,21 +3,46 @@ import os
 from Banco import Banco
 from Cliente import Cliente
 from Conta import Conta
+import datetime
+
+
+import os
+import json
+import datetime
 
 def salvar_banco_em_arquivo(banco, nome_arquivo):
+    # Verifica se é uma instância de Banco
     if not isinstance(banco, Banco):
         raise TypeError("O objeto informado não é uma instância da classe Banco.")
 
+    # Usa a data atual se banco.dataCadastro não estiver definido
+    if hasattr(banco, 'dataCadastro') and banco.dataCadastro:
+        data = banco.dataCadastro
+        if isinstance(data, datetime.datetime):
+            data_formatada = data.strftime("%d-%m-%Y %H:%M")
+        elif isinstance(data, str):
+            try:
+                data_obj = datetime.datetime.strptime(data, "%d-%m-%Y %H:%M")
+                data_formatada = data_obj.strftime("%d-%m-%Y %H:%M")
+            except ValueError:
+                data_formatada = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
+        else:
+            data_formatada = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
+    else:
+        data_formatada = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
+
+    # Cria o dicionário para salvar
     dados_novos = {
         "id": banco.id,
         "agencias": banco.agencias,
         "clientes": banco.clientes,
-        "contas": banco.contas
+        "contas": banco.contas,
+        "dataCadastro": data_formatada
     }
 
     bancos = []
 
-    # Carrega bancos existentes (se o arquivo existir)
+    # Carrega bancos existentes, se o arquivo existir
     if os.path.exists(nome_arquivo):
         with open(nome_arquivo, 'r', encoding='utf-8') as f:
             try:
@@ -25,7 +50,7 @@ def salvar_banco_em_arquivo(banco, nome_arquivo):
             except json.JSONDecodeError:
                 bancos = []
 
-    # Verifica se banco com mesmo ID já existe
+    # Atualiza banco existente ou adiciona novo
     atualizado = False
     for i, b in enumerate(bancos):
         if b['id'] == banco.id:
@@ -36,9 +61,12 @@ def salvar_banco_em_arquivo(banco, nome_arquivo):
     if not atualizado:
         bancos.append(dados_novos)
 
-    # Salva novamente
+    # Salva novamente no arquivo
     with open(nome_arquivo, 'w', encoding='utf-8') as f:
         json.dump(bancos, f, indent=4, ensure_ascii=False)
+
+    print(f"Banco {banco.id} salvo com sucesso em '{nome_arquivo}'")
+
 
 def carregar_banco_por_id(nome_arquivo):
 
@@ -52,8 +80,10 @@ def carregar_banco_por_id(nome_arquivo):
         return []
 
     bancos = []
+    data = datetime.datetime.now()
+    data_formatada = data.strftime("%d-%m-%Y %H:%M")
     for b in dados:
-        banco = Banco(id=b.get('id'), agencias=b.get('agencias', []))
+        banco = Banco(id=b.get('id'), dataCadastro=b.get('dataCadastro',data_formatada), agencias=b.get('agencias', []))
         banco.clientes = b.get('clientes', [])
         banco.contas = b.get('contas', [])
         bancos.append(banco)

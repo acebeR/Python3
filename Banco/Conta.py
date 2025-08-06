@@ -1,17 +1,19 @@
 # Classe base
 from abc import ABC, abstractmethod
 class Conta:
-    def __init__(self, numero,agencia,saldo):
+    def __init__(self, numero,agencia,saldo,dataCadastro):
         self.numero = numero
         self.agencia = agencia
         self.saldo = saldo
+        self.dataCadastro = dataCadastro
 
     def to_dict(self):
         return {
             "numero": self.numero,
             "agencia": self.agencia,
             "saldo": self.saldo,
-            "tipo": self.tipo()  # opcional: identifica o tipo no JSON
+            "tipo": self.tipo(),  # opcional: identifica o tipo no JSON
+            "dataCadastro": self.dataCadastro
         }
 
     def depositar(self):
@@ -35,7 +37,7 @@ class ContaCorrente(Conta):
     
     @classmethod
     def from_dict(cls, dados):
-        return cls(dados["numero"], dados["agencia"], dados["saldo"])
+        return cls(dados["numero"], dados["agencia"], dados["saldo"], dados["dataCadastro"])
     
     def sacar(self, valor):
         if valor <= self.saldo:
@@ -53,7 +55,8 @@ class ContaPoupanca(Conta):
         return cls(
             numero=dados["numero"],
             agencia=dados["agencia"],
-            saldo=dados["saldo"]
+            saldo=dados["saldo"],
+            dataCadastro=dados["dataCadastro"]
         )
     
     def sacar(self, valor):

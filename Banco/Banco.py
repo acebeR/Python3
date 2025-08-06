@@ -1,9 +1,11 @@
 class Banco:
-    def __init__(self, id,agencias):
+    def __init__(self, id,agencias,dataCadastro):
         self.id = id
         self.agencias = agencias 
         self.clientes = []
         self.contas = []
+        self.dataCadastro = dataCadastro
+
 
     def listarAgencias(self):
         for agencia in self.agencias:
