@@ -9,7 +9,7 @@ Python 3 completo: PySide6, Django, Selenium, Regexp, Testes, TDD, POO, Design P
 # Enviar Email
 Objetivo: Enviar email em Python
 </br>
-<img src="https://github.com/acebeR/Python3/Enviar_email/Projeto-envia-email.gif?raw=true" alt="Minha imagem" width="600" />
+<img src="https://github.com/acebeR/Python3/blob/main/Enviar_email/Projeto-envia-email.gif?raw=true" alt="Minha imagem" width="600" />
 # Simulação Banco
 Objetivo: Treinar meus conhecimentos de OOP e Python
 </br>
